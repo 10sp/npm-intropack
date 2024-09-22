@@ -2,8 +2,6 @@
 // Function to log your details in the terminal
 function logDetails() {
   let date = new Date();
-  date.setFullYear(2024, 3, 6); // Set the year, month (0-indexed), and day
-  date.setHours(23, 44, 32); // Set the hours, minutes, and seconds
 
   let options = {
       year: 'numeric',
@@ -18,7 +16,7 @@ function logDetails() {
 
   let currentTime = date.toLocaleString('en-US', options) + ' IST +05:30';
   
-  const message = `Hello! The time is ${currentTime}. I'm Shivanagouda R Patil, a Software Developer at Sahaj Gaming. I specialize in backend development with NodeJS and Java, and have experience in mobile application development using Flutter and Kotlin. My skills include cloud computing and data management.`;
+  const message = `Hello! The time is ${currentTime}. I'm Shivangouda R Patil, a Software Developer at Sahaj Gaming. I specialize in backend development with NodeJS and Java, and have experience in mobile application development using Flutter and Kotlin. My skills include cloud computing and data management.`;
   
   const twitterLink = "https://twitter.com/exclusiveshiv";
   const linkedinLink = "https://www.linkedin.com/in/ishivpatil/";
