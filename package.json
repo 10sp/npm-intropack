@@ -1,15 +1,15 @@
 {
-  "name": "helri-shiv",
-  "version": "1.1.1",
+  "name": "wassup-shiva",
+  "version": "1.1.41",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "helri-Shiv": "index.js"
+    "wassup-shiva": "index.js"
   },
   "keywords": [],
-  "author": "Shivanagouda Patil",
+  "author": "Shivangouda Patil",
   "license": "ISC",
   "description": ""
 }
