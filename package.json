@@ -1,15 +1,15 @@
 {
-  "name": "wassup-shiva",
+  "name": "waddup-shiva",
   "version": "1.1.41",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "wassup-shiva": "index.js"
+    "waddup-shiva": "index.js"
   },
   "keywords": [],
-  "author": "Shivangouda Patil",
+  "author": "Shivanagouda Patil",
   "license": "ISC",
   "description": ""
 }

